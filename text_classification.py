@@ -57,7 +57,10 @@ class ClassificationTsvReader(DatasetReader):
     def _read(self, file_path: str, sep: str = '\t') -> Iterable[Instance]:
         '''
         :param file_path: a local file path or a url
-        :param sep: by default separate row with '\t' to read tsv, also you can pass ',' to read csv
+        :param sep: by default separate row with '\t' to read tsv, also you can pass ',' to read csv,
+                    but you must make sure the text itself doesn't contain any ',', otherwise it will
+                    go wrong. If the csv file's text contains ',', you should use the _read() below
+                    using pandas.read_csv() to load the file.
         '''
         with open(cached_path(file_path), 'r') as lines:
             for line in islice(lines, 1, None):
@@ -476,6 +479,13 @@ def run_training_loop():
         print("Starting training")
         trainer.train()
         print("Finished training")
+        # Evaluate model on test data
+        # print("Starting testing")
+        # test_data = dataset_reader.read('test.txt')
+        # test_data.index_with(vocab)
+        # data_loader = DataLoader(test_data, batch_size=batch_size)
+        # results = evaluate(model, data_loader, cuda_device=cuda_device)
+        # print('Test results: ', results)
 
     # outputs = model.forward_on_instances(instances)
     # print(outputs)
@@ -493,18 +503,12 @@ if __name__ == '__main__':
     vocab = model.vocab
 
     # Here's how to save the model.
+    print("Saving model and vocabulary...")
     os.makedirs("temp_dir", exist_ok=True)
     with open("temp_dir/model.th", 'wb') as f:
         torch.save(model.state_dict(), f)
     vocab.save_to_files("temp_dir/vocabulary")
-
-    # print("vocab size: ", vocab.get_vocab_size("tokens"))
-    # train_data = dataset_reader.read('/Users/tianhongzxy/Downloads/contradictory-my-dear-watson/train.txt')
-    # train_data.index_with(vocab)
-    # data_loader = DataLoader(train_data, batch_size=8)
-
-    # results = evaluate(model, data_loader)
-    # print(results)
+    print("Saved!")
 
     predictor = SentenceClassifierPredictor(model, dataset_reader)
     output = predictor.predict("我叫天宏。 [SEP] 我很喜欢自然语言处理。")
