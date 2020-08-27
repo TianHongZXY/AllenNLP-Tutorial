@@ -6,10 +6,10 @@ from allennlp.data.tokenizers import Tokenizer, Token
 
 
 @Tokenizer.register('jieba')
-class JiebaTokenzer(Tokenizer):
+class JiebaTokenizer(Tokenizer):
     """
-    A ``Tokenizer`` that uses JIEBA's tokenizer. To Split Chinese sentences.
-    :user_dict: a txt file, one word in a line.
+    A ``Tokenizer`` that uses jieba's tokenizer to split Chinese sentences.
+    :param user_dict: a txt file, one word per line.
     """
     def __init__(self,
                  pos_tags: bool = False,
@@ -44,7 +44,7 @@ class JiebaTokenzer(Tokenizer):
 
 # if __name__ == '__main__':
 #     text = "我叫天宏，我很喜欢自然语言处理。"
-#     tokenizer = JiebaTokenzer(pos_tags=True)
+#     tokenizer = JiebaTokenizer(pos_tags=True)
 #     tokens = tokenizer.tokenize(text)
 #     print('/'.join([x.text for x in tokens]))
 #     print('/'.join([x.pos_ for x in tokens]))

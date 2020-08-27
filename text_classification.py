@@ -13,7 +13,7 @@ from allennlp.nn.regularizers import RegularizerApplicator, L1Regularizer, L2Reg
 from allennlp.data.samplers import BucketBatchSampler
 from allennlp.data import Instance, DatasetReader, TextFieldTensors, DataLoader
 from allennlp.data.fields import TextField, LabelField
-from allennlp_tutorial.JiebaTokenizer.jiebatokenizer import JiebaTokenzer
+from allennlp_tutorial.JiebaTokenizer.jiebatokenizer import JiebaTokenizer
 from allennlp_tutorial.BertTokenizer.berttokenizer import BERTTokenizer
 from allennlp.data.tokenizers import SpacyTokenizer, Token, Tokenizer, WhitespaceTokenizer, PretrainedTransformerTokenizer
 from allennlp.data.vocabulary import Vocabulary, _read_pretrained_tokens
@@ -63,7 +63,8 @@ class ClassificationTsvReader(DatasetReader):
                     using pandas.read_csv() to load the file.
         '''
         with open(cached_path(file_path), 'r') as lines:
-            for line in islice(lines, 1, None):
+            # skip the first line which is column name, stop = None means we read all the rows
+            for line in islice(lines, 1, stop=None):
                 text, _, __, label = line.strip().split(sep)
                 yield self.text_to_instance(text, label)
 
@@ -438,7 +439,7 @@ def run_training_loop():
         regexes=[
             ('embedder.*', L2Regularizer(alpha=1e-3)),
             ('classifier.*weight', L2Regularizer(alpha=1e-3)),
-            ('classifier.*bias', L1Regularizer(alpha=1e-2))
+            # ('classifier.*bias', L1Regularizer(alpha=1e-2)) # 不要对bias进行正则，否则容易欠拟合
         ]
     )
     model = build_model(vocab,

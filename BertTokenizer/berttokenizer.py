@@ -6,7 +6,8 @@ from transformers import BertTokenizer
 class BERTTokenizer(Tokenizer):
     """
     A ``Tokenizer`` that uses BERT's tokenizer.
-    :vocab_file: a txt file, one word in a line.
+    :param vocab_file: a path to a vocab file(one word per line) or
+                       a model name like 'bert-base-uncased'
     """
     def __init__(self,
                  vocab_file: str,
