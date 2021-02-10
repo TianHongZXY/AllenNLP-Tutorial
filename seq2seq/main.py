@@ -40,9 +40,6 @@ if __name__ == '__main__':
     parser.add_argument('--lr', default=1e-4, type=float, help='learning rate')
     args, unparsed = parser.parse_known_args()
 
-    train_file_path = args.train_file
-    val_file_path = args.valid_file
-    test_file_path = args.test_file
     device = torch.device(args.gpu if (torch.cuda.is_available() and args.gpu >= 0) else 'cpu')
 
     source_token_indexers = {"tokens": SingleIdTokenIndexer(namespace="source_tokens"),
@@ -97,6 +94,10 @@ if __name__ == '__main__':
     val_loader.index_with(vocab)
     model = create_seq2seqmodel(vocab, src_embedders=src_embedders, tgt_embedders=tgt_embedders, hidden_dim=args.hid_dim,
                                 max_decoding_steps=args.maxlen, device=device)
+    def count_parameters(model):
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"The model has {count_parameters(model) parameters.}")
+
     save_dir = None
     if args.save:
         tz_sh = tz.gettz('Asia/Shanghai')
@@ -106,5 +107,5 @@ if __name__ == '__main__':
             os.mkdir(save_dir)
         with open(os.path.join(save_dir, 'args.txt'), 'w') as f:
             json.dump(args.__dict__, f, indent=2)
-    train(args, model=model, dataset_reader=dataset_reader,
+    train(args, model=model, dataset_reader=dataset_reader, num_epochs=args.n_epochs,
           train_loader=train_loader, val_loader=val_loader, serialization_dir=save_dir, device=device)
