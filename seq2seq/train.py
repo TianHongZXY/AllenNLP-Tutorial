@@ -18,12 +18,11 @@ def train(args, model, dataset_reader, train_loader, device=0,
                                      grad_clipping=args.clip,
                                      )
     trainer.train()
-    # for i in range(10):
-    #     print('Epoch: {}'.format(i * num_epochs))
-    predictor = Seq2SeqPredictor(model, dataset_reader)
 
-    for instance in itertools.islice(test_data, 10):
-        print('SOURCE:', instance.fields['source_tokens'].tokens)
-        print('GOLD:', instance.fields['target_tokens'].tokens)
-        print('PRED:', predictor.predict_instance(instance)['predicted_tokens'])
-        print('-' * 50)
+    if test_data is not None:
+        predictor = Seq2SeqPredictor(model, dataset_reader)
+        for instance in itertools.islice(test_data, 10):
+            print('SOURCE:', instance.fields['source_tokens'].tokens)
+            print('GOLD:', instance.fields['target_tokens'].tokens)
+            print('PRED:', predictor.predict_instance(instance)['predicted_tokens'])
+            print('-' * 50)

@@ -53,7 +53,7 @@ if __name__ == '__main__':
     vocab = Vocabulary.from_instances(train_data)
 
     #  valid_data = dataset_reader.read(args.valid_file)
-    #  test_data = dataset_reader.read(args.test_file)
+    test_data = dataset_reader.read(args.test_file)
     
     src_embedding = Embedding(embedding_dim=args.emb_dim,
                           vocab_namespace="source_tokens",
@@ -96,7 +96,7 @@ if __name__ == '__main__':
                                 max_decoding_steps=args.maxlen, device=device)
     def count_parameters(model):
         return sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"The model has {count_parameters(model) parameters.}")
+    print(f"The model has {count_parameters(model)} parameters.")
 
     save_dir = None
     if args.save:
@@ -108,4 +108,4 @@ if __name__ == '__main__':
         with open(os.path.join(save_dir, 'args.txt'), 'w') as f:
             json.dump(args.__dict__, f, indent=2)
     train(args, model=model, dataset_reader=dataset_reader, num_epochs=args.n_epochs,
-          train_loader=train_loader, val_loader=val_loader, serialization_dir=save_dir, device=device)
+          train_loader=train_loader, val_loader=val_loader, test_data=test_data, serialization_dir=save_dir, device=device)
